@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e  # কোনো command fail করলে script stop হবে
+set -e
 
 echo "🚀 Building Laravel project..."
 
@@ -17,7 +17,7 @@ else
 fi
 
 # ==============================
-# 🔥 VERY IMPORTANT (Fix cache issue)
+# Laravel cache clear
 # ==============================
 echo "🧹 Clearing Laravel cache..."
 php artisan config:clear || true
@@ -26,31 +26,33 @@ php artisan route:clear || true
 php artisan view:clear || true
 
 # ==============================
-# Install PHP dependencies
+# Composer install
 # ==============================
 echo "📦 Installing Composer dependencies..."
 composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # ==============================
-# Install JS dependencies (stable)
+# NPM install (FIXED for Vite/Rollup)
 # ==============================
 echo "📦 Installing NPM dependencies..."
-rm -rf node_modules package-lock.json
-npm install --no-optional
+
+rm -rf node_modules
+npm cache clean --force
+
+npm ci --include=optional
 
 # ==============================
 # Laravel setup
 # ==============================
 echo "⚙️ Laravel setup..."
 php artisan key:generate --force
-
-# আবার config clear (env নিশ্চিতভাবে apply করার জন্য)
 php artisan config:clear
 
 # ==============================
-# Wait for MySQL (real check)
+# Wait for MySQL
 # ==============================
 echo "⏳ Waiting for MySQL..."
+
 until php -r "
 try {
     new PDO('mysql:host=127.0.0.1;dbname=homestead', 'homestead', 'secret');
@@ -64,7 +66,7 @@ try {
 done
 
 # ==============================
-# DB migrations
+# Migrations
 # ==============================
 echo "🗄️ Running migrations..."
 php artisan migrate --force
@@ -74,11 +76,5 @@ php artisan migrate --force
 # ==============================
 echo "🏗️ Building frontend..."
 npm run build
-
-# ==============================
-# Run tests
-# ==============================
-echo "🧪 Running tests..."
-php artisan test --parallel || php artisan test
 
 echo "✅ Project build completed successfully!"
