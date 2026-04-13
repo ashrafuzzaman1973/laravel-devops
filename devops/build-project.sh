@@ -1,20 +1,37 @@
 #!/bin/bash
 
-# Author Ashrafuzzaman Ashraf | ashrafdiu1973@gmail.com
-# Used inside Bitbucket pipelines. Builds Laravel project and prepares it
-# for testing. Creates an .env file from .env.pipelines.
-
-# Install dependencies.
-composer install --no-interaction
-npm install
+echo "🚀 Building Laravel project..."
 
 # Here we create link between the .env.pipelines file and the .env file.
 ln -f -s .env.pipelines .env
 
-# run your scripts.
-php artisan migrate --no-interaction
-php artisan key:generate
-# php artisan passport:client --personal <<EOF
+# Install PHP dependencies
+echo "📦 Installing Composer dependencies..."
+composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Run npm build.
-npm run prod
+# Install JS dependencies
+echo "📦 Installing NPM dependencies..."
+npm install
+
+# Laravel setup
+echo "⚙️ Laravel setup..."
+php artisan key:generate
+php artisan config:clear
+php artisan cache:clear
+
+# Wait for MySQL
+echo "⏳ Waiting for MySQL..."
+sleep 10
+
+# Run migrations
+php artisan migrate --force
+
+# Build frontend (Vite)
+echo "🏗️ Building frontend..."
+npm run build
+
+# Run tests (optional)
+echo "🧪 Running tests..."
+php artisan test
+
+echo "✅ Project build completed!"
