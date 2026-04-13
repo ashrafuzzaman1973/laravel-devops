@@ -2,19 +2,18 @@ image: php:8.2-fpm
 
 pipelines:
   default:
-    - parallel:
-      - step:
-          services:
-            - mysql
-          name: 'Build and Test'
-          script:
-            - bash ./devops/build-server.sh
-            - bash ./devops/build-project.sh
-
-      - step:
-          name: 'Lint'
-          script:
-            - echo "Your linting goes here..."
+    - step:
+        services:
+          - mysql
+        name: 'Build and Test'
+        script:
+          - bash ./devops/build-server.sh
+          - bash ./devops/build-project.sh
+          - bash ./devops/run-tests.sh
+#      - step:
+#          name: 'Lint'
+#          script:
+#            - echo "Your linting goes here..."
 
     # The following deployment steps will be executed for each pipeline run. To configure your steps and conditionally deploy see https://support.atlassian.com/bitbucket-cloud/docs/configure-bitbucket-pipelinesyml/
 #    - step:
