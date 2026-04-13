@@ -39,7 +39,7 @@ echo "📦 Installing NPM dependencies..."
 rm -rf node_modules
 npm cache clean --force
 
-npm ci --include=optional
+npm install --include=optional
 
 # ==============================
 # Laravel setup
