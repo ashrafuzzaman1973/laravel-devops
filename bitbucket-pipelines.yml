@@ -4,9 +4,13 @@ pipelines:
   default:
     - parallel:
       - step:
+          services:
+            - mysql
           name: 'Build and Test'
           script:
             - bash ./devops/build-server.sh
+            - bash ./devops/build-project.sh
+
       - step:
           name: 'Lint'
           script:
@@ -24,3 +28,14 @@ pipelines:
 #        trigger: 'manual'
 #        script:
 #          - echo "Your deployment to production script goes here..."
+
+
+definitions:
+  services:
+    mysql:
+      image: mysql:8.0
+      environment:
+        MYSQL_DATABASE: 'homestead'
+        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_USER: 'homestead'
+        MYSQL_PASSWORD: 'secret'
