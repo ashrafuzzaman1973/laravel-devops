@@ -22,8 +22,8 @@ then
 fi
 
 # Install Node.js (v18)
-echo "📦 Installing Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+echo "📦 Installing Node.js 22..."
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y nodejs
 
 # Check versions
