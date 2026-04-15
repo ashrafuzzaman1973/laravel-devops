@@ -21,12 +21,13 @@ pipelines:
 #        deployment: staging
 #        script:
 #          - echo "Your deployment to staging script goes here..."
-#    - step:
-#        name: 'Deployment to Production'
-#        deployment: production
-#        trigger: 'manual'
-#        script:
-#          - echo "Your deployment to production script goes here..."
+    - step:
+        name: 'Deployment to Production'
+        deployment: production
+        trigger: 'manual'
+        script:
+          - bash ./devops/build-server.sh
+          - bash ./devops/build-for-production.sh
 
 
 definitions:
