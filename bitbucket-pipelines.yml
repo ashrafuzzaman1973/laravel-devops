@@ -28,6 +28,8 @@ pipelines:
         script:
           - bash ./devops/build-server.sh
           - bash ./devops/build-for-production.sh
+          - bash ./devops/scripts/deploy-production.sh
+
 
 
 definitions:
