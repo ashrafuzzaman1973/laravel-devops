@@ -1,59 +1,246 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Laravel 12 CI/CD using AWS (EC2, RDS, S3, CodeDeploy) & Bitbucket Pipelines
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+### ✍️ Author: Ashrafuzzaman  
+📧 Email: ashrafdiu1973@gmail.com  
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🔥 Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This repository demonstrates a **complete CI/CD pipeline for Laravel 12** using AWS services and Bitbucket Pipelines.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+It automates the full deployment lifecycle:
 
-## Learning Laravel
+> **Code Push → Build → Test → Package → Deploy → Live 🚀**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ⚙️ Tech Stack
 
-## Laravel Sponsors
+- 🖥️ **AWS EC2** – Application server (Production/Staging)
+- 🗄️ **AWS RDS (MySQL 8)** – Managed database
+- 📦 **AWS S3** – Artifact storage (deployment bundles)
+- 🚀 **AWS CodeDeploy** – Deployment automation
+- 🔐 **AWS Systems Manager (SSM)** – Secure `.env` management
+- 🔁 **Bitbucket Pipelines** – Continuous Integration & Deployment
+- 🧠 **Bash Scripts** – Custom automation scripts
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🧭 CI/CD Workflow
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```text
+Developer Push 
+   ↓
+Bitbucket Pipeline Triggered
+   ↓
+Build & Test Laravel App
+   ↓
+Create Deployment Bundle (.tar.gz)
+   ↓
+Upload Bundle to AWS S3
+   ↓
+Trigger AWS CodeDeploy
+   ↓
+Deploy to EC2 Instance
+   ↓
+Laravel Application Live 🚀
+````
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🔐 Required Repository Variables
 
-## Code of Conduct
+Configure in:
+**Bitbucket → Repository Settings → Pipelines → Repository Variables**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+AWS_ACCESS_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_DEFAULT_REGION=ap-south-1
+S3_BUCKET=your-s3-bucket-name
+DEPLOYMENT_GROUP_NAME=your-codedeploy-group
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📁 DevOps Directory Structure
 
-## License
+```bash
+devops/
+│
+├── build-server.sh              # Setup pipeline environment
+├── build-project.sh             # Prepare Laravel for testing
+├── build-for-production.sh      # Optimize for production
+├── run-tests.sh                 # Run automated tests
+├── deploy-production.sh         # Deploy to AWS (S3 + CodeDeploy)
+│
+├── hooks/
+│   └── after-install.sh         # Runs on EC2 after deployment
+│
+└── scripts/
+    ├── generate-env.sh          # Generate .env from AWS SSM
+    ├── build-production-server.sh # (Manual) Setup EC2 server
+    └── configure-apache.sh      # (Optional) Apache config
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 📄 Key Configuration Files
+
+### `bitbucket-pipelines.yml`
+
+* Defines CI/CD pipeline steps
+* Runs build, test, and deployment scripts
+
+### `appspec.yml`
+
+* Used by AWS CodeDeploy
+* Defines deployment lifecycle hooks
+
+### `bundle.conf`
+
+* Lists files included in deployment package
+
+### `.env.pipelines`
+
+* Used during pipeline build
+* Loads environment variables from AWS SSM
+
+---
+
+## 🖥️ EC2 Deployment Hook Example
+
+```bash
+#!/bin/bash
+
+cd /var/www/laravel
+
+sudo chown -R ubuntu:ubuntu .
+chmod -R 775 storage bootstrap/cache
+
+composer install --no-dev --optimize-autoloader
+
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+---
+
+## ▶️ How to Use
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/ashrafuzzaman1973/laravel-devops.git
+cd test-laravel-app
+```
+
+---
+
+### 2. Configure AWS
+
+* Create EC2 instance
+* Setup RDS (MySQL)
+* Create S3 bucket
+* Setup CodeDeploy application & deployment group
+
+---
+
+### 3. Add Bitbucket Variables
+
+Add all required environment variables (see above)
+
+---
+
+### 4. Push Code
+
+```bash
+git add .
+git commit -m "Initial setup"
+git push origin main
+```
+
+---
+
+### 5. Trigger Deployment
+
+* Pipeline runs automatically
+* Production deploy is **manual trigger**
+
+---
+
+## 🧪 Logs & Debugging
+
+Check CodeDeploy logs on EC2:
+
+```bash
+/var/log/aws/codedeploy-agent/codedeploy-agent.log
+```
+
+---
+
+## ⚠️ Common Issues
+
+### ❌ DeploymentConfigDoesNotExistException
+
+Use:
+
+```text
+CodeDeployDefault.AllAtOnce
+```
+
+---
+
+### ❌ Permission Issues
+
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+---
+
+### ❌ Missing .env File
+
+👉 Use AWS Systems Manager Parameter Store
+
+---
+
+## 🎯 Features
+
+✅ Fully automated Laravel deployment
+✅ Zero manual file upload
+✅ Secure environment management
+✅ Scalable AWS infrastructure
+✅ Production-ready CI/CD pipeline
+
+---
+
+## 🚀 Future Improvements
+
+* Add staging environment
+* Implement zero-downtime deployment
+* Use Docker for containerization
+* Add monitoring (CloudWatch / Laravel Horizon)
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first.
+
+---
+
+## 📄 License
+
+This project is open-source and available under the MIT License.
+
+---
+
+## 👋 Author
+
+**Ashrafuzzaman**
+Full Stack Developer (Laravel | Vue | Nuxt | React)
+
